@@ -2,27 +2,6 @@ drop schema if exists sdProjectRTX ;
 create schema sdProjectRTX;
 use sdProjectRTX;
 
-create table game(
-game_id int primary key unique not null AUTO_INCREMENT,
-game_name varchar(50) not null,
-game_series varchar(50) not null,
-publisher_id int not null,
-release_date date not null,
-game_description varchar(1000) not null
-);
-
-create table game_tags (
-game_id int not null,
-tag varchar(30) not null,
-PRIMARY KEY (game_id, tag)
-);
-
-create table game_screenshots(
-game_id int not null,
-screenshot varchar(256) not null,
-PRIMARY KEY (game_id, screenshot)
-);
-
 create table publisher(
 publisher_id int primary key unique not null AUTO_INCREMENT,
 e_mail varchar(128) unique not null,
@@ -30,6 +9,30 @@ pass varchar(64) not null,
 publisher_name varchar(50) not null,
 picture varchar(256) not null default 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
 publisher_description varchar(1000) not null
+);
+
+create table game(
+game_id int primary key unique not null AUTO_INCREMENT,
+game_name varchar(50) not null,
+game_series varchar(50) not null,
+publisher_id int not null,
+release_date date not null,
+game_description varchar(1000) not null,
+FOREIGN KEY (publisher_id) REFERENCES publisher(publisher_id)
+);
+
+create table game_tags (
+game_id int not null,
+tag varchar(30) not null,
+PRIMARY KEY (game_id, tag),
+FOREIGN KEY (game_id) REFERENCES game(game_id)
+);
+
+create table game_screenshots(
+game_id int not null,
+screenshot varchar(256) not null,
+PRIMARY KEY (game_id, screenshot),
+FOREIGN KEY (game_id) REFERENCES game(game_id)
 );
 
 create table users (
@@ -45,19 +48,25 @@ playing int
 create table owned_games (
 user_id int not null,
 game_id int not null,
-PRIMARY KEY (user_id, game_id)
+PRIMARY KEY (user_id, game_id),
+FOREIGN KEY (user_id) REFERENCES users(user_id),
+FOREIGN KEY (game_id) REFERENCES game(game_id)
 );
 
 create table games_history (
 user_id int not null,
 game_id int not null,
-PRIMARY KEY (user_id, game_id)
+PRIMARY KEY (user_id, game_id),
+FOREIGN KEY (user_id) REFERENCES users(user_id),
+FOREIGN KEY (game_id) REFERENCES game(game_id)
 );
 
 create table friends (
 user_id int not null,
 friend_id int not null,
-PRIMARY KEY (user_id, friend_id)
+PRIMARY KEY (user_id, friend_id),
+FOREIGN KEY (user_id) REFERENCES users(user_id),
+FOREIGN KEY (friend_id) REFERENCES users(user_id)
 );
 
 insert into publisher (e_mail, pass, publisher_name, picture, publisher_description) values
