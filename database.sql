@@ -53,14 +53,6 @@ FOREIGN KEY (user_id) REFERENCES users(user_id),
 FOREIGN KEY (game_id) REFERENCES game(game_id)
 );
 
-create table games_history (
-user_id int not null,
-game_id int not null,
-PRIMARY KEY (user_id, game_id),
-FOREIGN KEY (user_id) REFERENCES users(user_id),
-FOREIGN KEY (game_id) REFERENCES game(game_id)
-);
-
 create table friends (
 user_id int not null,
 friend_id int not null,
@@ -164,11 +156,6 @@ insert into owned_games (user_id, game_id) values
 (3, 1), (3, 2), (3, 4), (3, 5), (3, 7), (3, 11), (3, 12), (3, 13), (3, 15), (3, 16), (3, 17), (3, 20),
 (4, 1), (4, 4), (4, 7), (4, 8), (4, 9), (4, 10), (4, 12), (4, 13), (4, 14), (4, 18), (4, 19),
 (5, 6), (5, 7), (5, 8), (5, 9), (5, 11), (5, 12), (5, 13), (5, 14), (5, 19);
-insert into games_history (user_id, game_id) values
-(1, 11), (1, 19),
-(2, 7), (2, 1), (2, 20), (2, 6),
-(3, 20), (3, 12), (3, 13), (3, 17), (3, 5),
-(5, 19), (5, 11), (5, 6);
 insert into friends (user_id, friend_id) values
 (1, 2), (1, 4), (3, 4), (3, 5), (4, 5),
 (2, 1), (4, 1), (4, 3), (5, 3), (5, 4);

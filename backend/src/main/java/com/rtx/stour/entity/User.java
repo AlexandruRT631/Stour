@@ -27,45 +27,26 @@ public class User {
     @Column(name="moderator")
     private boolean moderator;
 
-    @Column(name="playing")
-    private Long playing;
+    @ManyToOne
+    @JoinColumn(name="playing")
+    private Game playing;
 
-    @ElementCollection
-    @CollectionTable(
-            name="owned_games",
-            joinColumns = @JoinColumn(name="user_id")
-    )
-    @Column(name="game_id")
-    private List<Long> ownedGames;
+    @ManyToMany
+    @JoinTable(name = "owned_games",
+               joinColumns = @JoinColumn(name="user_id"),
+               inverseJoinColumns = @JoinColumn(name="game_id"))
+    private List<Game> games;
 
-    @ElementCollection
-    @CollectionTable(
-            name="games_history",
-            joinColumns = @JoinColumn(name="user_id")
-    )
-    @Column(name="game_id")
-    private List<Long> history;
-
-    @ElementCollection
-    @CollectionTable(
-            name="friends",
-            joinColumns = @JoinColumn(name="user_id")
-    )
-    @Column(name="friend_id")
-    private List<Long> friends;
-
-    @ElementCollection
-    @CollectionTable(
-            name="friends",
-            joinColumns = @JoinColumn(name="friend_id")
-    )
-    @Column(name="user_id")
-    private List<Long> friends2;
+    @ManyToMany
+    @JoinTable(name="friends",
+               joinColumns = @JoinColumn(name="user_id"),
+               inverseJoinColumns = @JoinColumn(name="friend_id"))
+    private List<User> friends;
 
     public User() {
     }
 
-    public User(long id, String email, String password, String nickname, String picture, boolean moderator, Long playing, List<Long> ownedGames, List<Long> history, List<Long> friends) {
+    public User(long id, String email, String password, String nickname, String picture, boolean moderator, Game playing, List<Game> games, List<User> friends) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -73,10 +54,8 @@ public class User {
         this.picture = picture;
         this.moderator = moderator;
         this.playing = playing;
-        this.ownedGames = ownedGames;
-        this.history = history;
+        this.games = games;
         this.friends = friends;
-        this.friends2 = friends;
     }
 
     public long getId() {
@@ -127,36 +106,27 @@ public class User {
         this.moderator = moderator;
     }
 
-    public Long getPlaying() {
+    public Game getPlaying() {
         return playing;
     }
 
-    public void setPlaying(Long playing) {
+    public void setPlaying(Game playing) {
         this.playing = playing;
     }
 
-    public List<Long> getOwnedGames() {
-        return ownedGames;
+    public List<Game> getGames() {
+        return games;
     }
 
-    public void setOwnedGames(List<Long> ownedGames) {
-        this.ownedGames = ownedGames;
+    public void setGames(List<Game> games) {
+        this.games = games;
     }
 
-    public List<Long> getHistory() {
-        return history;
-    }
-
-    public void setHistory(List<Long> history) {
-        this.history = history;
-    }
-
-    public List<Long> getFriends() {
+    public List<User> getFriends() {
         return friends;
     }
 
-    public void setFriends(List<Long> friends) {
+    public void setFriends(List<User> friends) {
         this.friends = friends;
-        this.friends2 = friends;
     }
 }

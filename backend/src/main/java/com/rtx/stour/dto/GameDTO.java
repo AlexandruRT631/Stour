@@ -1,9 +1,12 @@
 package com.rtx.stour.dto;
 
+import com.rtx.stour.entity.Game;
+
 import java.util.Date;
 import java.util.List;
 
 public class GameDTO {
+    private Long gameId;
     private String name;
     private String series;
     private Date releaseDate;
@@ -15,7 +18,8 @@ public class GameDTO {
     public GameDTO() {
     }
 
-    public GameDTO( String name, String series, Date releaseDate, String description, List<String> tags, List<String> screenshots, String publisher) {
+    public GameDTO(Long gameId, String name, String series, Date releaseDate, String description, List<String> tags, List<String> screenshots, String publisher) {
+        this.gameId = gameId;
         this.name = name;
         this.series = series;
         this.releaseDate = releaseDate;
@@ -23,6 +27,17 @@ public class GameDTO {
         this.tags = tags;
         this.screenshots = screenshots;
         this.publisher = publisher;
+    }
+
+    public GameDTO(Game game) {
+        this.gameId = game.getId();
+        this.name = game.getName();
+        this.series = game.getSeries();
+        this.releaseDate = game.getReleaseDate();
+        this.description = game.getDescription();
+        this.tags = game.getTags();
+        this.screenshots = game.getScreenshots();
+        this.publisher = game.getPublisher().getName();
     }
 
     public String getName() {
@@ -79,6 +94,14 @@ public class GameDTO {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public Long getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(Long gameId) {
+        this.gameId = gameId;
     }
 
     public void replaceNullFields(GameDTO gameDTO) {

@@ -2,11 +2,14 @@ package com.rtx.stour.service;
 
 import com.rtx.stour.dto.GameDTO;
 import com.rtx.stour.entity.Game;
+import com.rtx.stour.entity.Publisher;
 import com.rtx.stour.repository.GameRepository;
 import com.rtx.stour.repository.PublisherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,37 +22,45 @@ public class GameService {
     PublisherRepository publisherRepository;
 
     public List<GameDTO> retrieveGames() {
-        return ((List<Game>) gameRepository.findAll()).stream().map(game -> new GameDTO(game.getName(), game.getSeries(), game.getReleaseDate(), game.getDescription(), game.getTags(), game.getScreenshots(), game.getPublisher().getName())).toList();
+        return ((List<Game>) gameRepository.findAll()).stream().map(GameDTO::new).toList();
     }
 
     public GameDTO retrieveGameById(Long id) {
         Optional<Game> game = gameRepository.findById(id);
-        if (game.isPresent()) {
-            return new GameDTO(game.get().getName(), game.get().getSeries(), game.get().getReleaseDate(), game.get().getDescription(), game.get().getTags(), game.get().getScreenshots(), game.get().getPublisher().getName());
-        } else {
-            return null;
-        }
+        return game.map(GameDTO::new).orElse(null);
     }
 
     public GameDTO retrieveGameByName(String name) {
         Optional<Game> game = gameRepository.findByName(name);
-        if (game.isPresent()) {
-            return new GameDTO(game.get().getName(), game.get().getSeries(), game.get().getReleaseDate(), game.get().getDescription(), game.get().getTags(), game.get().getScreenshots(), game.get().getPublisher().getName());
-        } else {
-            return null;
-        }
+        return game.map(GameDTO::new).orElse(null);
     }
 
     public GameDTO addGame(GameDTO gameDTO) {
         if (gameRepository.findByName(gameDTO.getName()).isEmpty()) {
-            Game insertedGame = gameRepository.save(new Game(gameDTO.getName(), gameDTO.getSeries(), gameDTO.getReleaseDate(), gameDTO.getDescription(), gameDTO.getTags(), gameDTO.getScreenshots(), publisherRepository.findByName(gameDTO.getPublisher()).get()));
-            return new GameDTO(insertedGame.getName(), insertedGame.getSeries(), insertedGame.getReleaseDate(), insertedGame.getDescription(), insertedGame.getTags(), insertedGame.getScreenshots(), insertedGame.getPublisher().getName());
+            Game newGame = new Game();
+            newGame.setName(gameDTO.getName());
+            newGame.setSeries(gameDTO.getSeries());
+            newGame.setReleaseDate(new Date());
+            newGame.setDescription(gameDTO.getDescription());
+            newGame.setTags(gameDTO.getTags());
+            newGame.setScreenshots(gameDTO.getScreenshots());
+            Optional<Publisher> publisherGet = publisherRepository.findByName(gameDTO.getName());
+            if (publisherGet.isPresent()) {
+                newGame.setPublisher(publisherGet.get());
+            }
+            else {
+                return null;
+            }
+            newGame.setOwners(new ArrayList<>());
+            newGame.setCurrentlyPlaying(new ArrayList<>());
+            Game insertedGame = gameRepository.save(newGame);
+            return new GameDTO(insertedGame);
         }
         return null;
     }
 
-    public GameDTO modifyGame(GameDTO gameDTO, String name) {
-        Optional<Game> oldGame = gameRepository.findByName(name);
+    public GameDTO modifyGame(GameDTO gameDTO) {
+        Optional<Game> oldGame = gameRepository.findById(gameDTO.getGameId());
         if(oldGame.isPresent()) {
             Game game = oldGame.get();
             if (gameDTO.getName() != null) {
@@ -57,9 +68,6 @@ public class GameService {
             }
             if (gameDTO.getSeries() != null) {
                 game.setSeries(gameDTO.getSeries());
-            }
-            if (gameDTO.getReleaseDate() != null) {
-                game.setReleaseDate(gameDTO.getReleaseDate());
             }
             if (gameDTO.getDescription() != null) {
                 game.setDescription(gameDTO.getDescription());
@@ -71,10 +79,14 @@ public class GameService {
                 game.setScreenshots(gameDTO.getScreenshots());
             }
             if (gameDTO.getPublisher() != null) {
-                game.setPublisher(publisherRepository.findByName(gameDTO.getPublisher()).get());
+                Optional<Publisher> publisherGet = publisherRepository.findByName(gameDTO.getPublisher());
+                if (publisherGet.isPresent()) {
+                    game.setPublisher(publisherGet.get());
+                }
+                else return null;
             }
             Game newGame = gameRepository.save(game);
-            return new GameDTO(newGame.getName(), newGame.getSeries(), newGame.getReleaseDate(), newGame.getDescription(), newGame.getTags(), newGame.getScreenshots(), newGame.getPublisher().getName());
+            return new GameDTO(newGame);
         }
         return null;
     }

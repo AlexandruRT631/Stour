@@ -1,24 +1,42 @@
 package com.rtx.stour.dto;
 
+import com.rtx.stour.entity.Game;
+import com.rtx.stour.entity.User;
+
 import java.util.List;
 
 public class UserDTO {
+    private Long userId;
     private String nickname;
     private String picture;
     private boolean moderator;
     private String playing;
     private List<String> ownedGames;
-    private List<String> history;
     private List<String> friends;
 
-    public UserDTO(String nickname, String picture, boolean moderator, String playing, List<String> ownedGames, List<String> history, List<String> friends) {
+    public UserDTO(Long userId, String nickname, String picture, boolean moderator, String playing, List<String> ownedGames, List<String> friends) {
+        this.userId = userId;
         this.nickname = nickname;
         this.picture = picture;
         this.moderator = moderator;
         this.playing = playing;
         this.ownedGames = ownedGames;
-        this.history = history;
         this.friends = friends;
+    }
+
+    public UserDTO(User user) {
+        this.userId = user.getId();
+        this.nickname = user.getNickname();
+        this.picture = user.getPicture();
+        this.moderator = user.isModerator();
+        if (user.getPlaying() == null) {
+            this.playing = null;
+        }
+        else {
+            this.playing = user.getPlaying().getName();
+        }
+        this.ownedGames = user.getGames().stream().map(Game::getName).toList();
+        this.friends = user.getFriends().stream().map(User::getNickname).toList();
     }
 
     public String getNickname() {
@@ -61,19 +79,19 @@ public class UserDTO {
         this.ownedGames = ownedGames;
     }
 
-    public List<String> getHistory() {
-        return history;
-    }
-
-    public void setHistory(List<String> history) {
-        this.history = history;
-    }
-
     public List<String> getFriends() {
         return friends;
     }
 
     public void setFriends(List<String> friends) {
         this.friends = friends;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

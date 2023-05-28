@@ -17,38 +17,30 @@ public class PublisherService {
     PublisherRepository publisherRepository;
 
     public List<PublisherDTO> retrievePublishers() {
-        return ((List<Publisher>)publisherRepository.findAll()).stream().map(publisher -> new PublisherDTO(publisher.getName(), publisher.getPicture(), publisher.getDescription(), publisher.getGames().stream().map(Game::getName).toList())).toList();
+        return ((List<Publisher>)publisherRepository.findAll()).stream().map(PublisherDTO::new).toList();
     }
 
     public PublisherDTO retrievePublisherById(Long id) {
         Optional<Publisher> publisher = publisherRepository.findById(id);
-        if (publisher.isPresent()) {
-            return new PublisherDTO(publisher.get().getName(), publisher.get().getPicture(), publisher.get().getDescription(), publisher.get().getGames().stream().map(Game::getName).toList());
-        } else {
-            return null;
-        }
+        return publisher.map(PublisherDTO::new).orElse(null);
     }
 
     public PublisherDTO retrievePublisherByName(String name) {
         Optional<Publisher> publisher = publisherRepository.findByName(name);
-        if (publisher.isPresent()) {
-            return new PublisherDTO(publisher.get().getName(), publisher.get().getPicture(), publisher.get().getDescription(), publisher.get().getGames().stream().map(Game::getName).toList());
-        } else {
-            return null;
-        }
+        return publisher.map(PublisherDTO::new).orElse(null);
     }
 
     public PublisherDTO addPublisher(Publisher publisher) {
         if (publisherRepository.findByName(publisher.getName()).isEmpty()) {
             publisher.setGames(new ArrayList<>());
             Publisher newPublisher = publisherRepository.save(publisher);
-            return new PublisherDTO(newPublisher.getName(), newPublisher.getPicture(), newPublisher.getDescription(), newPublisher.getGames().stream().map(Game::getName).toList());
+            return new PublisherDTO(newPublisher);
         }
         return null;
     }
 
-    public PublisherDTO modifyPublisher(Publisher modifiedPublisher, String name) {
-        Optional<Publisher> oldPublisher = publisherRepository.findByName(name);
+    public PublisherDTO modifyPublisher(Publisher modifiedPublisher) {
+        Optional<Publisher> oldPublisher = publisherRepository.findById(modifiedPublisher.getId());
         if(oldPublisher.isPresent()) {
             Publisher publisher = oldPublisher.get();
             if (modifiedPublisher.getEmail() != null) {
@@ -67,7 +59,7 @@ public class PublisherService {
                 publisher.setDescription(modifiedPublisher.getDescription());
             }
             Publisher newPublisher = publisherRepository.save(publisher);
-            return new PublisherDTO(newPublisher.getName(), newPublisher.getPicture(), newPublisher.getDescription(), newPublisher.getGames().stream().map(Game::getName).toList());
+            return new PublisherDTO(newPublisher);
         }
         return null;
     }

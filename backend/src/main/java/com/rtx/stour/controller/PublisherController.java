@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/publishers")
+@CrossOrigin
 public class PublisherController {
     @Autowired
     PublisherService publisherService;
@@ -40,8 +41,8 @@ public class PublisherController {
 
     @PutMapping("/updatePublisher/{name}")
     @ResponseBody
-    public PublisherDTO updatePublisher(@RequestBody Publisher publisher, @PathVariable String name) {
-        return publisherService.modifyPublisher(publisher, name);
+    public PublisherDTO updatePublisher(@RequestBody Publisher publisher) {
+        return publisherService.modifyPublisher(publisher);
     }
 
     @DeleteMapping("/deleteById/{id}")

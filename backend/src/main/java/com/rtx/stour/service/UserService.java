@@ -27,71 +27,46 @@ public class UserService {
             return null;
         }
         Optional<Game> game = gameRepository.findById(id);
-        if (game.isPresent()) {
-            return game.get().getName();
-        } else {
-            return null;
-        }
+        return game.map(Game::getName).orElse(null);
     }
 
     public List<UserDTO> retrieveUsers() {
-        return ((List<User>) userRepository.findAll()).stream().map(user -> new UserDTO(
-                user.getNickname(),
-                user.getPicture(),
-                user.isModerator(),
-                getGameName(user.getPlaying()),
-                user.getOwnedGames().stream().map(gameId -> gameRepository.findById(gameId).get().getName()).toList(),
-                user.getHistory().stream().map(gameId -> gameRepository.findById(gameId).get().getName()).toList(),
-                user.getFriends().stream().map(friendId -> userRepository.findById(friendId).get().getNickname()).toList()
-        )).toList();
-    }
-
-    private UserDTO toUserDTO(User user) {
-        return new UserDTO(
-                user.getNickname(),
-                user.getPicture(),
-                user.isModerator(),
-                getGameName(user.getPlaying()),
-                user.getOwnedGames().stream().map(gameId -> gameRepository.findById(gameId).get().getName()).toList(),
-                user.getHistory().stream().map(gameId -> gameRepository.findById(gameId).get().getName()).toList(),
-                user.getFriends().stream().map(friendId -> userRepository.findById(friendId).get().getNickname()).toList()
-        );
+        return ((List<User>) userRepository.findAll()).stream().map(UserDTO::new).toList();
     }
 
     public UserDTO retrieveUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return toUserDTO(user.get());
-        }
-        return null;
+        return user.map(UserDTO::new).orElse(null);
     }
 
     public UserDTO retrieveUserByNickname(String nickname) {
         Optional<User> user = userRepository.findByNickname(nickname);
-        if (user.isPresent()) {
-            return toUserDTO(user.get());
-        }
-        return null;
+        return user.map(UserDTO::new).orElse(null);
     }
 
     public UserDTO addUser(User user) {
         if (userRepository.findByNickname(user.getNickname()).isEmpty()) {
             user.setPlaying(null);
-            user.setOwnedGames(new ArrayList<>());
-            user.setHistory(new ArrayList<>());
+            user.setGames(new ArrayList<>());
             user.setFriends(new ArrayList<>());
             User insertedUser = userRepository.save(user);
-            return toUserDTO(insertedUser);
+            return new UserDTO(insertedUser);
         }
         return null;
     }
 
-    public UserDTO modifyUser(User modifiedUser, String nickname) {
-        Optional<User> oldUser = userRepository.findByNickname(nickname);
+    public UserDTO modifyUser(User modifiedUser) {
+        Optional<User> oldUser = userRepository.findById(modifiedUser.getId());
         if (oldUser.isPresent()) {
             User user = oldUser.get();
+            if (modifiedUser.getEmail() != null) {
+                user.setEmail(modifiedUser.getEmail());
+            }
             if (modifiedUser.getNickname() != null) {
                 user.setNickname(modifiedUser.getNickname());
+            }
+            if (modifiedUser.getPassword() != null) {
+                user.setPassword(modifiedUser.getPassword());
             }
             if (modifiedUser.getPicture() != null) {
                 user.setPicture(modifiedUser.getPicture());
@@ -99,27 +74,8 @@ public class UserService {
             if (modifiedUser.isModerator()) {
                 user.setModerator(modifiedUser.isModerator());
             }
-            if (modifiedUser.getOwnedGames() != null) {
-                user.setOwnedGames(modifiedUser.getOwnedGames());
-                if (user.getPlaying() != null && !user.getOwnedGames().contains(user.getPlaying())) {
-                    user.setPlaying(null);
-                }
-            }
-            if (!Objects.equals(modifiedUser.getPlaying(), user.getPlaying())) {
-                if (modifiedUser.getPlaying() != null && user.getOwnedGames().contains(modifiedUser.getPlaying())) {
-                    user.setPlaying(modifiedUser.getPlaying());
-                } else {
-                    user.setPlaying(null);
-                }
-            }
-            if (modifiedUser.getHistory() != null) {
-                user.setHistory(modifiedUser.getHistory());
-            }
-            if (modifiedUser.getFriends() != null) {
-                user.setFriends(modifiedUser.getFriends());
-            }
             User newUser = userRepository.save(user);
-            return toUserDTO(newUser);
+            return new UserDTO(newUser);
         }
         return null;
     }

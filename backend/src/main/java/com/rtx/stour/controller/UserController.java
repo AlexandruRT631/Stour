@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin
 public class UserController {
     @Autowired
     UserService userService;
@@ -40,8 +41,8 @@ public class UserController {
 
     @PutMapping("/updateUser/{nickname}")
     @ResponseBody
-    public UserDTO updateUser(@RequestBody User user, @PathVariable String nickname) {
-        return userService.modifyUser(user, nickname);
+    public UserDTO updateUser(@RequestBody User user) {
+        return userService.modifyUser(user);
     }
 
     @DeleteMapping("/deleteById/{id}")

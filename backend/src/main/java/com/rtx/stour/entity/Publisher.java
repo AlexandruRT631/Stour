@@ -44,15 +44,6 @@ public class Publisher {
         this.games = games;
     }
 
-    public Publisher(String email, String pass, String name, String picture, String description, List<Game> games) {
-        this.email = email;
-        this.pass = pass;
-        this.name = name;
-        this.picture = picture;
-        this.description = description;
-        this.games = games;
-    }
-
     public long getId() {
         return id;
     }

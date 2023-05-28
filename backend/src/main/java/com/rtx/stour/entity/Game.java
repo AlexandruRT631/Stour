@@ -48,26 +48,16 @@ public class Game {
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "owned_games",
-            joinColumns = @JoinColumn(name = "game_id")
-    )
-    @Column(name = "user_id")
-    private List<Integer> owners;
+    @ManyToMany(mappedBy = "games")
+    private List<User> owners;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "games_history",
-            joinColumns = @JoinColumn(name = "game_id")
-    )
-    @Column(name = "user_id")
-    private List<Integer> history;
+    @OneToMany(mappedBy = "playing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<User> currentlyPlaying;
 
     public Game() {
     }
 
-    public Game(long id, String name, String series, Date releaseDate, String description, List<String> tags, List<String> screenshots, Publisher publisher) {
+    public Game(long id, String name, String series, Date releaseDate, String description, List<String> tags, List<String> screenshots, Publisher publisher, List<User> owners, List<User> currentlyPlaying) {
         this.id = id;
         this.name = name;
         this.series = series;
@@ -76,16 +66,8 @@ public class Game {
         this.tags = tags;
         this.screenshots = screenshots;
         this.publisher = publisher;
-    }
-
-    public Game(String name, String series, Date releaseDate, String description, List<String> tags, List<String> screenshots, Publisher publisher) {
-        this.name = name;
-        this.series = series;
-        this.releaseDate = releaseDate;
-        this.description = description;
-        this.tags = tags;
-        this.screenshots = screenshots;
-        this.publisher = publisher;
+        this.owners = owners;
+        this.currentlyPlaying = currentlyPlaying;
     }
 
     public long getId() {
@@ -152,19 +134,19 @@ public class Game {
         this.publisher = publisher;
     }
 
-    public List<Integer> getOwners() {
+    public List<User> getOwners() {
         return owners;
     }
 
-    public void setOwners(List<Integer> owners) {
+    public void setOwners(List<User> owners) {
         this.owners = owners;
     }
 
-    public List<Integer> getHistory() {
-        return history;
+    public List<User> getCurrentlyPlaying() {
+        return currentlyPlaying;
     }
 
-    public void setHistory(List<Integer> history) {
-        this.history = history;
+    public void setCurrentlyPlaying(List<User> currentlyPlaying) {
+        this.currentlyPlaying = currentlyPlaying;
     }
 }

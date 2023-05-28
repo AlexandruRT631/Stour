@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/games")
+@CrossOrigin
 public class GameController {
     @Autowired
     GameService gameService;
@@ -39,8 +40,8 @@ public class GameController {
 
     @PutMapping("/updateGame/{name}")
     @ResponseBody
-    public GameDTO updateGame(@RequestBody GameDTO gameDTO, @PathVariable String name) {
-        return gameService.modifyGame(gameDTO, name);
+    public GameDTO updateGame(@RequestBody GameDTO gameDTO) {
+        return gameService.modifyGame(gameDTO);
     }
 
     @DeleteMapping("/deleteById/{id}")
